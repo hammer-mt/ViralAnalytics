@@ -38,7 +38,7 @@ property = "abc-123456789-001";
 
 // Get page metadata
 var date = new Date();
-const Data={
+var data={
     property: property,
     userHash: userHash,
     refHash: refHash,
@@ -57,17 +57,17 @@ const Data={
 }
 
 // Set up API call
-const params={
+var params={
     headers:{
         "content-type":"application/json; charset=UTF-8"
     },
-    body:JSON.stringify(Data),
+    body:JSON.stringify(data),
     method:"POST"
 };
-const Url="https://us-central1-genial-core-277717.cloudfunctions.net/logdata";
+var url="https://us-central1-genial-core-277717.cloudfunctions.net/logdata";
 
 // Make API call
-fetch(Url, params)
+fetch(url, params)
 .then(function(res) {
     console.log(res.status);
 })
