@@ -19,6 +19,8 @@ def make_viraldata(request):
         print(value)
         viraldata[var] = value
 
+    return viraldata
+    
 def save_viraldata(viraldata):
     db = firestore.Client()
 
@@ -58,6 +60,13 @@ def main(request):
     user_hash = parse_var('userHash', request)
     print(user_hash)
 
+    # Make the viral data dictionary
+    viraldata = make_viraldata(request)
+
+    # Save the viral data dictionary
+    save_viraldata(viraldata)
+
+    # Return a 200 status
     return ("logged", 200, headers)
 
     
