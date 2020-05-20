@@ -61,7 +61,7 @@ const params={
     headers:{
         "content-type":"application/json; charset=UTF-8"
     },
-    body:Data,
+    body:JSON.stringify(Data),
     method:"POST"
 };
 const Url="https://us-central1-genial-core-277717.cloudfunctions.net/logdata";

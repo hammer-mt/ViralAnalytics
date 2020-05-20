@@ -1,11 +1,30 @@
+from google.cloud import firestore
+
 def parse_var(var, request):
-    request_json = request.get_json()
-    if request.args and var in request.args:
-        return request.args.get(var)
-    elif request_json and var in request_json:
+    request_json = request.get_json(silent=True)
+    request_args = request.args
+
+    if request_json and var in request_json:
         return request_json[var]
+    elif request_args and var in request_args:
+        return request_args[var]
     else:
-        return False
+        return ""
+
+def make_viraldata(request):
+    viraldata = {}
+    for var in request:
+        print(var)
+        value = parse_var(var, request)
+        print(value)
+        viraldata[var] = value
+
+def save_viraldata(viraldata):
+    db = firestore.Client()
+
+    property_id = viraldata.get('property')
+    property_ref = db.collection(u'{}'.format(property_id))
+    property_ref.set(viraldata)
 
 
 def main(request):
@@ -23,7 +42,7 @@ def main(request):
         # header and caches preflight response for an 3600s
         headers = {
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST',
+            'Access-Control-Allow-Methods': 'POST',
             'Access-Control-Allow-Headers': 'Content-Type',
             'Access-Control-Max-Age': '3600'
         }
@@ -32,10 +51,14 @@ def main(request):
 
     # Set CORS headers for the main request
     headers = {
-        'Content-Type':'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Origin': '*'
     }
-
+    
     # Parse the data from the request
-    print(parse_var('userHash', request))
+    user_hash = parse_var('userHash', request)
+    print(user_hash)
+
+    return ("logged", 200, headers)
+
+    
+    
