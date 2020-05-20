@@ -11,22 +11,26 @@ def parse_var(var, request):
     else:
         return ""
 
+# example request payload for testing
+# {"property":"abc-123456789-001","userHash":"90ek2bljzbnicx5skuvwu","refHash":"#90ek2bljzbnicx5skuvwu","href":"https://try.ladder.io/?utm_expid=.OShV8i84QBebyz05Qhs27g.1&utm_referrer=#90ek2bljzbnicx5skuvwu","referrer":"","title":"Award-Winning Marketing Agency: Growth, Scale, & ROI - Ladder","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:76.0) Gecko/20100101 Firefox/76.0","doNotTrack":"unspecified","cookieEnabled":true,"height":1080,"width":1920,"colorDepth":24,"timeZone":"Europe/London","locale":"en-GB","timeZoneOffset":-60}
+
 def make_viraldata(request):
     viraldata = {}
-    for var in request:
-        print(var)
+    var_list = ['property', 'userHash', 'refHash', 'href', 'referrer', 'title',
+                'userAgent', 'doNotTrack', 'cookieEnabled', 'height', 'width',
+                'colorDepth', 'timeZone', 'locale', 'timeZoneOffset']
+
+    for var in var_list:
         value = parse_var(var, request)
-        print(value)
         viraldata[var] = value
 
     return viraldata
-    
+
 def save_viraldata(viraldata):
     db = firestore.Client()
 
-    property_id = viraldata.get('property')
-    property_ref = db.collection(u'{}'.format(property_id))
-    property_ref.set(viraldata)
+    post_ref = db.collection(u'posts').document()
+    post_ref.set(viraldata)
 
 
 def main(request):
@@ -58,16 +62,13 @@ def main(request):
     
     # Parse the data from the request
     user_hash = parse_var('userHash', request)
-    print(user_hash)
 
     # Make the viral data dictionary
     viraldata = make_viraldata(request)
+    print(viraldata)
 
     # Save the viral data dictionary
     save_viraldata(viraldata)
 
     # Return a 200 status
     return ("logged", 200, headers)
-
-    
-    
