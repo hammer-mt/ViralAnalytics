@@ -19,12 +19,12 @@
 */
 
 // Get user hash from local storage
-userHash = localStorage.userHash;
+userHash = localStorage['va:userHash'];
 
 // if there’s no hash id, make one and store it
 if(!userHash){
     userHash = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    localStorage.userHash = userHash;
+    localStorage['va:userHash'] = userHash;
 }
 
 // Get ref hash from URL
@@ -53,7 +53,13 @@ var data={
     colorDepth: window.screen.colorDepth,
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     locale: Intl.DateTimeFormat().resolvedOptions().locale,
-    timeZoneOffset: date.getTimezoneOffset()
+    timeZoneOffset: date.getTimezoneOffset(),
+    protocol: window.location.protocol,
+    hostname: window.location.hostname,
+    port: window.location.port,
+    hash: window.location.hash,
+    pathname: window.location.pathname,
+    search: window.location.search
 }
 
 // Set up API call
