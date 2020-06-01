@@ -30,9 +30,6 @@ if(!userHash){
 // Get ref hash from URL
 refHash = window.location.hash;
 
-// Change window location hash
-window.location.hash = userHash;
-
 // Set property id
 property = "abc-123456789-001";
 
@@ -61,6 +58,9 @@ var data={
     pathname: window.location.pathname,
     search: window.location.search
 }
+
+// Change window location hash
+window.location.hash = userHash;
 
 // Set up API call
 var params={
