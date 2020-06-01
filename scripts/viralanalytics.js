@@ -30,8 +30,11 @@ if(!userHash){
 // Get ref hash from URL
 refHash = window.location.hash;
 
-// Set property id
-property = "abc-123456789-001";
+// Get property id
+var scripts = document.getElementsByTagName('script');
+var lastScript = scripts[scripts.length-1];
+var scriptName = lastScript;
+var property = scriptName.getAttribute('data-pid');
 
 // Get page metadata
 var date = new Date();
