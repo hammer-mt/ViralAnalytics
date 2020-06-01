@@ -31,10 +31,8 @@ if(!userHash){
 refHash = window.location.hash;
 
 // Get property id
-var scripts = document.getElementsByTagName('script');
-var lastScript = scripts[scripts.length-1];
-var scriptName = lastScript;
-var property = scriptName.getAttribute('data-pid');
+var vaScript = document.getElementById('vaScript');
+var property = vaScript.getAttribute('data-property');
 
 // Get page metadata
 var date = new Date();
