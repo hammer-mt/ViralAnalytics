@@ -23,11 +23,44 @@ exports.vaLoad = (req, res) => {
 
         // Get user hash from local storage
         userHash = localStorage['va:userHash'];
+        sessionHash = sessionStorage['va:sessionHash'];
 
-        // if there’s no hash id, make one and store it
+        // if there’s no user hash id, make one and store it
         if(!userHash){
             userHash = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
             localStorage['va:userHash'] = userHash;
+            localStorage.removeItem("va:sessionCount");
+        }
+
+        // if there’s no session hash id, make one and store it
+        if(!sessionHash){
+            sessionHash = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            sessionStorage['va:sessionHash'] = sessionHash;
+            sessionStorage.removeItem("va:pageviewCount");
+        }
+
+        // Get session and pageview counts
+        sessionCount = localStorage['va:sessionCount'];
+        pageviewCount = sessionStorage['va:pageviewCount'];
+
+        // Check session count not null and set if so
+        if(!sessionCount){
+            sessionCount = "0";
+            localStorage['va:sessionCount'] = sessionCount;
+        } else {
+            sessionCount = JSON.parse(sessionCount);
+            sessionCount = JSON.stringify(sessionCount + 1);
+            localStorage['va:sessionCount'] = sessionCount;
+        }
+
+        // Check pageview count not null and set if so
+        if(!pageviewCount){
+            pageviewCount = "0";
+            sessionStorage['va:pageviewCount'] = pageviewCount;
+        } else {
+            pageviewCount = JSON.parse(pageviewCount);
+            pageviewCount = JSON.stringify(pageviewCount + 1);
+            sessionStorage['va:pageviewCount'] = pageviewCount;
         }
 
         // Get ref hash from URL
@@ -37,12 +70,18 @@ exports.vaLoad = (req, res) => {
         var vaScript = document.getElementById('vaScript');
         var property = vaScript.getAttribute('data-property');
 
+        // Check for bookmarked posts
+        var bookmarkedPost = JSON.stringify(refHash === '#'+userHash);
+
         // Get page metadata
         var date = new Date();
         var data={
             property: property,
             userHash: userHash,
+            sessionHash: sessionHash,
             refHash: refHash,
+            sessionCount: sessionCount,
+            pageviewCount: pageviewCount,
             href: window.location.href,
             referrer: document.referrer,
             title: document.title,
