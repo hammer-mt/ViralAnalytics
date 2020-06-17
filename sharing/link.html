@@ -1,0 +1,85 @@
+<section id="va-link-sharing">
+    <div id="va-linkbox" onclick="VAcopyLink()" onmouseout="VAresetTooltip()">
+        <span id="va-tooltip">Copy to clipboard</span>
+        <input id="va-link" type="text" value="https://www.saxifrage.xyz/viral-analytics">
+        <button id="va-copybutton">Copy</button>
+    </div>
+</section>
+    
+<style>
+#va-link {
+    width: 230px;
+    height: 37px;
+    border-style: none;
+    border: none !important;
+    padding-left: 0.5rem;
+}
+#va-linkbox {
+    position: relative;
+    display: inline-block;
+    margin: 0.5rem 0.5rem;
+    font-family: "Space Grotesk", Arial, sans-serif;
+    font-size: 18px;
+    letter-spacing: .5px;
+}
+#va-linkbox #va-tooltip {
+    visibility: hidden;
+    width: 140px;
+    background-color: rgb(195, 195, 195);
+    color: #000;
+    text-align: center;
+    border-radius: 0.25rem;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 14px;
+}
+#va-linkbox #va-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+#va-linkbox:hover #va-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+#va-copybutton {
+    border-radius: .25rem;
+    background-color: rgb(195, 195, 195);
+    margin: 1px 0 0.05rem;
+    height: 37px;
+    padding: 0 1rem;
+}
+</style>
+
+<script>
+function VAcopyLink() {
+    var copyLink = document.getElementById("va-link");
+    copyLink.select();
+    copyLink.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    
+    var tooltip = document.getElementById("va-tooltip");
+    tooltip.innerHTML = "Copied: " + copyLink.value.substring(0, 28) + "...";
+    tooltip.style.width = "290px";
+    tooltip.style.marginLeft = "-150px";
+}
+
+function VAresetTooltip() {
+    var tooltip = document.getElementById("va-tooltip");
+    tooltip.innerHTML = "Copy to clipboard";
+    tooltip.style.width = "140px";
+    tooltip.style.marginLeft = "-75px";
+}
+</script>
