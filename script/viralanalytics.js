@@ -21,9 +21,23 @@ exports.vaLoad = (req, res) => {
         * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         */
 
+        // Set a date for timestamp
+        var date = new Date();
+
+        // Check for expiry and remove if so
+        expire = Date.parse(sessionStorage['va:sessionExpire']);
+        if (date > expire) {
+            sessionStorage.removeItem("va:sessionExpire");
+            sessionStorage.removeItem("va:pageviewCount");
+            sessionStorage.removeItem("va:sessionHash");
+        }
+        
         // Get user hash from local storage
         userHash = localStorage['va:userHash'];
         sessionHash = sessionStorage['va:sessionHash'];
+
+        // Get ref hash from URL
+        refHash = window.location.hash;
 
         // if there’s no user hash id, make one and store it
         if(!userHash){
@@ -37,6 +51,9 @@ exports.vaLoad = (req, res) => {
             sessionHash = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
             sessionStorage['va:sessionHash'] = sessionHash;
             sessionStorage.removeItem("va:pageviewCount");
+            sessionStorage['va:sessionRefHash'] = refHash;
+            var expire = new Date(date.getTime() + 30*60000);
+            sessionStorage['va:sessionExpire'] = JSON.stringify(expire);
         }
 
         // Get session and pageview counts
@@ -63,9 +80,6 @@ exports.vaLoad = (req, res) => {
             sessionStorage['va:pageviewCount'] = pageviewCount;
         }
 
-        // Get ref hash from URL
-        refHash = window.location.hash;
-
         // Get property id
         var vaScript = document.getElementById('vaScript');
         var property = vaScript.getAttribute('data-property');
@@ -74,7 +88,6 @@ exports.vaLoad = (req, res) => {
         var bookmarkedPost = JSON.stringify(refHash === '#'+userHash);
 
         // Get page metadata
-        var date = new Date();
         var data={
             property: property,
             userHash: userHash,
@@ -99,7 +112,8 @@ exports.vaLoad = (req, res) => {
             port: window.location.port,
             hash: window.location.hash,
             pathname: window.location.pathname,
-            search: window.location.search
+            search: window.location.search,
+            bookmarked: bookmarkedPost
         }
 
         // Change window location hash
@@ -114,6 +128,13 @@ exports.vaLoad = (req, res) => {
 
         var copyLink = document.getElementById("va-link");
         copyLink.value = copyLink.value + "#" + userHash;
+
+        // Set sessionRefHash
+        sessionRefHash = sessionStorage['va:sessionRefHash'];
+
+        // Set hidden form field values for CRM
+        document.getElementById('VAUSERHASH').value=userHash;
+        document.getElementById('VAREFHASH').value=sessionRefHash;
 
         // Set up API call
         var params={
