@@ -105,6 +105,16 @@ exports.vaLoad = (req, res) => {
         // Change window location hash
         window.location.hash = userHash;
 
+        // Change social sharing buttons hash
+        var links = document.getElementById('va-social-sharing').getElementsByTagName('a');
+
+        for (var i=0, item; item = links[i]; i++) {
+            item.href = item.href + "%23" + userHash;
+        }
+
+        var copyLink = document.getElementById("va-link");
+        copyLink.value = copyLink.value + "#" + userHash;
+
         // Set up API call
         var params={
             headers:{
