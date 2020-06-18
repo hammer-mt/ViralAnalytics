@@ -51,7 +51,9 @@ exports.vaLoad = (req, res) => {
             sessionHash = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
             sessionStorage['va:sessionHash'] = sessionHash;
             sessionStorage.removeItem("va:pageviewCount");
-            sessionStorage['va:sessionRefHash'] = refHash;
+            if (refHash != "#"+userHash) {
+                sessionStorage['va:sessionRefHash'] = refHash;
+            }
             var expire = new Date(date.getTime() + 30*60000);
             sessionStorage['va:sessionExpire'] = JSON.stringify(expire);
         }
@@ -85,8 +87,12 @@ exports.vaLoad = (req, res) => {
         var property = vaScript.getAttribute('data-property');
 
         // Check for bookmarked posts
-        var bookmarkedPost = JSON.stringify(refHash === '#'+userHash);
-
+        if (pageviewCount == 0) {
+            var bookmarkedPost = JSON.stringify(refHash === '#'+userHash);
+        } else {
+            var bookmarkedPost = JSON.stringify(false);
+        }
+        
         // Get page metadata
         var data={
             property: property,

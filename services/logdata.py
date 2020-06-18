@@ -25,11 +25,10 @@ def get_location(request):
 
 def make_viraldata(request):
     viraldata = {}
-    var_list = ['property', 'userHash', 'userHash', 'refHash', 'href', 'referrer', 
-                'title', 'userAgent', 'doNotTrack', 'cookieEnabled', 'height', 'width',
-                'colorDepth', 'timeZone', 'locale', 'timeZoneOffset', 'protocol',
-                'hostname', 'port', 'hash', 'pathname', 'search', 'sessionCount',
-                'pageviewCount']
+    var_list = ['property', 'userHash', 'sessionHash', 'refHash', 'sessionCount', 'pageviewCount', 
+                'href', 'referrer', 'title', 'userAgent', 'doNotTrack', 'cookieEnabled', 'height',
+                'width', 'colorDepth', 'timeZone', 'locale', 'timeZoneOffset', 'protocol', 'hostname', 
+                'port', 'hash', 'pathname', 'search', 'bookmarked']
 
     for var in var_list:
         value = parse_var(var, request)
