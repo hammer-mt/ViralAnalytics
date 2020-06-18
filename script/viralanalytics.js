@@ -31,7 +31,7 @@ exports.vaLoad = (req, res) => {
             sessionStorage.removeItem("va:pageviewCount");
             sessionStorage.removeItem("va:sessionHash");
         }
-        
+
         // Get user hash from local storage
         userHash = localStorage['va:userHash'];
         sessionHash = sessionStorage['va:sessionHash'];
@@ -120,21 +120,30 @@ exports.vaLoad = (req, res) => {
         window.location.hash = userHash;
 
         // Change social sharing buttons hash
-        var links = document.getElementById('va-social-sharing').getElementsByTagName('a');
-
-        for (var i=0, item; item = links[i]; i++) {
-            item.href = item.href + "%23" + userHash;
+        var socialSharing = document.getElementById('va-social-sharing');
+        if (socialSharing) {
+            links = socialSharing.getElementsByTagName('a');
+            for (var i=0, item; item = links[i]; i++) {
+                item.href = item.href + "%23" + userHash;
+            }
+    
+            var copyLink = document.getElementById("va-link");
+            copyLink.value = copyLink.value + "#" + userHash;
         }
-
-        var copyLink = document.getElementById("va-link");
-        copyLink.value = copyLink.value + "#" + userHash;
 
         // Set sessionRefHash
         sessionRefHash = sessionStorage['va:sessionRefHash'];
 
         // Set hidden form field values for CRM
-        document.getElementById('VAUSERHASH').value=userHash;
-        document.getElementById('VAREFHASH').value=sessionRefHash;
+        userHashField = document.getElementById('VAUSERHASH');
+        refHashField = document.getElementById('VAUSERHASH');
+
+        if (userHashField) {
+            userHashField.value=userHash;
+        }
+        if (refHashField) {
+            refHashField.value=sessionRefHash;
+        }
 
         // Set up API call
         var params={
