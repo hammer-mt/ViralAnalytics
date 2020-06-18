@@ -159,9 +159,21 @@ exports.vaLoad = (req, res) => {
         request.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
         request.send(JSON.stringify(data));
 
+        // Log error message
         request.onreadystatechange = function() {
-            if (request.readyState == 4) {
-                console.log(request.status + ": "+ request.responseText);
+            if (this.readyState == 4 && this.status != 200) {
+                var error = this.status + ": "+ this.responseText
+                console.log(error);
+
+                // Send error to logging function
+                var url="https://us-central1-genial-core-277717.cloudfunctions.net/errorlogger";
+                var payload={
+                    message: error
+                }
+                var request = new XMLHttpRequest();
+                request.open("POST", url, true);
+                request.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+                request.send(JSON.stringify(payload));
             }
         }
     }
