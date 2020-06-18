@@ -152,23 +152,18 @@ exports.vaLoad = (req, res) => {
         }
 
         // Set up API call
-        var params={
-            headers:{
-                "content-type":"application/json; charset=UTF-8"
-            },
-            body:JSON.stringify(data),
-            method:"POST"
-        };
         var url="https://us-central1-genial-core-277717.cloudfunctions.net/va-post";
 
-        // Make API call
-        fetch(url, params)
-        .then(function(res) {
-            console.log(res.status);
-        })
-        .catch(function(error) {
-            console.log(error);
-        });
+        var request = new XMLHttpRequest();
+        request.open("POST", url, true);
+        request.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+        request.send(JSON.stringify(data));
+
+        request.onreadystatechange = function() {
+            if (request.readyState == 4) {
+                console.log(request.status + ": "+ request.responseText);
+            }
+        }
     }
     res.send("("+viralAnalyics.toString()+")();")
 };
