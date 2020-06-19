@@ -18,7 +18,7 @@ def main(request):
     elif request_json and 'message' in request_json:
         print(request_json['message'])
     else:
-        print(f'No message')
+        print(f'No error message')
 
 
     # Set CORS headers for the main request
