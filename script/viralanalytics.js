@@ -92,6 +92,24 @@ exports.vaLoad = (req, res) => {
         } else {
             var bookmarkedPost = JSON.stringify(false);
         }
+
+        // Try catch for unsupported APIs
+        try {
+            var height = window.screen.height;
+            var width = window.screen.width;
+            var colorDepth = window.screen.colorDepth;
+        } catch (error) {
+            var height = "";
+            var width = "";
+            var colorDepth = "";
+        }
+        try {
+            var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            var locale = Intl.DateTimeFormat().resolvedOptions().locale; 
+        } catch (error) {
+            var timeZone = "";
+            var locale = ""; 
+        }
         
         // Get page metadata
         var data={
@@ -107,11 +125,11 @@ exports.vaLoad = (req, res) => {
             userAgent: navigator.userAgent,
             doNotTrack: navigator.doNotTrack,
             cookieEnabled: navigator.cookieEnabled,
-            height: window.screen.height,
-            width: window.screen.width,
-            colorDepth: window.screen.colorDepth,
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            locale: Intl.DateTimeFormat().resolvedOptions().locale,
+            height: height,
+            width: width,
+            colorDepth: colorDepth,
+            timeZone: timeZone,
+            locale: locale,
             timeZoneOffset: date.getTimezoneOffset(),
             protocol: window.location.protocol,
             hostname: window.location.hostname,
