@@ -24,43 +24,71 @@ exports.vaLoad = (req, res) => {
         // Set a date for timestamp
         var date = new Date();
 
+        // Try for local and session storage
+        function storageAvailable(type) {
+            var storage;
+            try {
+                storage = window[type];
+                var x = '__storage_test__';
+                storage.setItem(x, x);
+                storage.removeItem(x);
+                return true;
+            }
+            catch(e) {
+                return e instanceof DOMException && (
+                    // everything except Firefox
+                    e.code === 22 ||
+                    // Firefox
+                    e.code === 1014 ||
+                    // test name field too, because code might not be present
+                    // everything except Firefox
+                    e.name === 'QuotaExceededError' ||
+                    // Firefox
+                    e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+                    // acknowledge QuotaExceededError only if there's something already stored
+                    (storage && storage.length !== 0);
+            }
+        }
+
+        var localStorageCheck = storageAvailable('localStorage');
+        var sessionStorageCheck = storageAvailable('sessionStorage');
+
         // Check for expiry and remove if so
-        expire = Date.parse(sessionStorage['va:sessionExpire']);
-        if (date > expire) {
+        var expire = sessionStorage['va:sessionExpire'];
+        var expiryDate = Date.parse(expire);
+        if (expire && date > expiryDate) {
             sessionStorage.removeItem("va:sessionExpire");
             sessionStorage.removeItem("va:pageviewCount");
             sessionStorage.removeItem("va:sessionHash");
         }
 
         // Get user hash from local storage
-        userHash = localStorage['va:userHash'];
-        sessionHash = sessionStorage['va:sessionHash'];
+        var userHash = localStorage['va:userHash'];
+        var sessionHash = sessionStorage['va:sessionHash'];
 
         // Get ref hash from URL
-        refHash = window.location.hash;
+        var refHash = window.location.hash;
 
         // if there’s no user hash id, make one and store it
         if(!userHash){
-            userHash = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            var userHash = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
             localStorage['va:userHash'] = userHash;
-            localStorage.removeItem("va:sessionCount");
         }
 
         // if there’s no session hash id, make one and store it
         if(!sessionHash){
             sessionHash = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
             sessionStorage['va:sessionHash'] = sessionHash;
-            sessionStorage.removeItem("va:pageviewCount");
             if (refHash != "#"+userHash) {
                 sessionStorage['va:sessionRefHash'] = refHash;
             }
-            var expire = new Date(date.getTime() + 30*60000);
-            sessionStorage['va:sessionExpire'] = JSON.stringify(expire);
+            var sessionExpire = new Date(date.getTime() + 30*60000);
+            sessionStorage['va:sessionExpire'] = JSON.stringify(sessionExpire);
         }
 
         // Get session and pageview counts
-        sessionCount = localStorage['va:sessionCount'];
-        pageviewCount = sessionStorage['va:pageviewCount'];
+        var sessionCount = localStorage['va:sessionCount'];
+        var pageviewCount = sessionStorage['va:pageviewCount'];
 
         // Check session count not null and set if so
         if(!sessionCount){
@@ -87,11 +115,22 @@ exports.vaLoad = (req, res) => {
         var property = vaScript.getAttribute('data-property');
 
         // Check for bookmarked posts
-        if (pageviewCount == 0) {
-            var bookmarkedPost = JSON.stringify(refHash === '#'+userHash);
+        if (pageviewCount == 0 && refHash == '#'+userHash) {
+            var bookmarkedPost = JSON.stringify(true);
         } else {
             var bookmarkedPost = JSON.stringify(false);
         }
+
+        // Set the session ref and params
+        if (pageviewCount == 0) {
+            sessionStorage['va:sessionReferrer'] = document.referrer;
+            sessionStorage['va:sessionParams'] = window.location.search;
+        }
+        var sessionReferrer = sessionStorage['va:sessionReferrer'];
+        var sessionParams = sessionStorage['va:sessionParams'];
+
+        // Set sessionRefHash
+        var sessionRefHash = sessionStorage['va:sessionRefHash'];
 
         // Try catch for unsupported APIs
         try {
@@ -137,7 +176,12 @@ exports.vaLoad = (req, res) => {
             hash: window.location.hash,
             pathname: window.location.pathname,
             search: window.location.search,
-            bookmarked: bookmarkedPost
+            bookmarked: bookmarkedPost,
+            sessionReferrer: sessionReferrer,
+            sessionParams: sessionParams,
+            sessionRefHash: sessionRefHash,
+            localStorageCheck: localStorageCheck,
+            sessionStorageCheck: sessionStorageCheck
         }
 
         // Change window location hash
@@ -155,17 +199,14 @@ exports.vaLoad = (req, res) => {
             copyLink.value = copyLink.value + "#" + userHash;
         }
 
-        // Set sessionRefHash
-        sessionRefHash = sessionStorage['va:sessionRefHash'];
-
         // Set hidden form field values for CRM
-        userHashField = document.getElementById('VAUSERHASH');
-        refHashField = document.getElementById('VAUSERHASH');
+        var userHashField = document.getElementById('VAUSERHASH');
+        var refHashField = document.getElementById('VAREFHASH');
 
-        if (userHashField) {
+        if (userHashField && userHash) {
             userHashField.value=userHash;
         }
-        if (refHashField) {
+        if (refHashField && sessionRefHash) {
             refHashField.value=sessionRefHash;
         }
 
