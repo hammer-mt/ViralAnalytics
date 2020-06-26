@@ -184,32 +184,6 @@ exports.vaLoad = (req, res) => {
             sessionStorageCheck: sessionStorageCheck
         }
 
-        // Change window location hash
-        window.location.hash = userHash;
-
-        // Change social sharing buttons hash
-        var socialSharing = document.getElementById('va-social-sharing');
-        if (socialSharing) {
-            links = socialSharing.getElementsByTagName('a');
-            for (var i=0, item; item = links[i]; i++) {
-                item.href = item.href + "%23" + userHash;
-            }
-    
-            var copyLink = document.getElementById("va-link");
-            copyLink.value = copyLink.value + "#" + userHash;
-        }
-
-        // Set hidden form field values for CRM
-        var userHashField = document.getElementById('VAUSERHASH');
-        var refHashField = document.getElementById('VAREFHASH');
-
-        if (userHashField && userHash) {
-            userHashField.value=userHash;
-        }
-        if (refHashField && sessionRefHash) {
-            refHashField.value=sessionRefHash;
-        }
-
         // Set up API call
         var url="https://us-central1-genial-core-277717.cloudfunctions.net/va-post";
 
@@ -235,6 +209,9 @@ exports.vaLoad = (req, res) => {
                 request.send(JSON.stringify(payload));
             }
         }
+        
+        // Change window location hash
+        window.location.hash = userHash;
     }
     res.send("("+viralAnalyics.toString()+")();")
 };
