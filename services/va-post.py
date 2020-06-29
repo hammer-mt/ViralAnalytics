@@ -29,7 +29,8 @@ def make_viraldata(request):
                 'href', 'referrer', 'title', 'userAgent', 'doNotTrack', 'cookieEnabled', 'height',
                 'width', 'colorDepth', 'timeZone', 'locale', 'timeZoneOffset', 'protocol', 'hostname', 
                 'port', 'hash', 'pathname', 'search', 'bookmarked', 'sessionReferrer', 'sessionParams',
-                'sessionRefHash', 'localStorageCheck', 'sessionStorageCheck']
+                'sessionRefHash', 'userReferrer', 'userParams', 'userRefHash', 'localStorageCheck', 
+                'sessionStorageCheck', 'eventName', 'eventMeta', 'timestamp']
 
     for var in var_list:
         value = parse_var(var, request)

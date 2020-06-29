@@ -39,7 +39,13 @@ SELECT
   JSON_EXTRACT_SCALAR(data, '$.sessionParams') AS sessionParams,
   JSON_EXTRACT_SCALAR(data, '$.sessionRefHash') AS sessionRefHash,
   JSON_EXTRACT_SCALAR(data, '$.localStorageCheck') AS localStorageCheck,
-  JSON_EXTRACT_SCALAR(data, '$.sessionStorageCheck') AS sessionStorageCheck
+  JSON_EXTRACT_SCALAR(data, '$.sessionStorageCheck') AS sessionStorageCheck,
+  JSON_EXTRACT_SCALAR(data, '$.userReferrer') AS userReferrer,
+  JSON_EXTRACT_SCALAR(data, '$.userParams') AS userParams,
+  JSON_EXTRACT_SCALAR(data, '$.userRefHash') AS userRefHash,
+  JSON_EXTRACT_SCALAR(data, '$.eventName') AS eventName,
+  JSON_EXTRACT_SCALAR(data, '$.eventMeta') AS eventMeta,
+  JSON_EXTRACT_SCALAR(data, '$.timestamp') AS localTimestamp
   
 FROM
   (

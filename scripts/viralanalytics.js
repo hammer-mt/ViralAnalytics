@@ -22,7 +22,7 @@ exports.vaLoad = (req, res) => {
         */
 
         // Log an event
-        window.vaEventLog = function(event="pageview", eventMeta="") {
+        window.vaEventLog = function(event="pageview", meta="") {
 
             // Get property id
             var vaScript = document.getElementById('vaScript');
@@ -109,8 +109,12 @@ exports.vaLoad = (req, res) => {
                 sessionStorage.removeItem("va:sessionHash");
             }
 
-            // Get ref hash from URL
-            var refHash = window.location.hash;
+            // Get valid ref hash
+            if (hash.search(/\w{21}/i) >= 0) {
+                var refHash = hash;
+            } else {
+                var refHash = "";
+            }
 
             // if there’s no user hash id, make one and store it
             if(!userHash){
@@ -119,6 +123,7 @@ exports.vaLoad = (req, res) => {
                 localStorage['va:userReferrer'] = referrer;
                 localStorage['va:userParams'] = search;
                 localStorage['va:userRefHash'] = refHash;
+                localStorage['va:sessionCount'] = "0";
             }
 
             // if there’s no session hash id, make one and store it
@@ -133,33 +138,32 @@ exports.vaLoad = (req, res) => {
 
                 var sessionExpire = new Date(date.getTime() + 30*60000);
                 sessionStorage['va:sessionExpire'] = JSON.stringify(sessionExpire);
+
+                var oldSessionCount = JSON.parse(localStorage['va:sessionCount']) || 0;
+                newSessionCount = JSON.stringify(oldSessionCount + 1);
+                localStorage['va:sessionCount'] = newSessionCount;
             }
 
             // Get session and pageview count
             var sessionCount = localStorage['va:sessionCount'];
             var pageviewCount = sessionStorage['va:pageviewCount'];
 
-            // Check session count not null and set if so
-            if(!sessionCount){
-                sessionCount = "0";
-                localStorage['va:sessionCount'] = sessionCount;
-            } else {
-                sessionCount = JSON.parse(sessionCount);
-                sessionCount = JSON.stringify(sessionCount + 1);
-                localStorage['va:sessionCount'] = sessionCount;
-            }
-
             // Get session marketing sources
             var sessionReferrer = sessionStorage['va:sessionReferrer'];
             var sessionParams = sessionStorage['va:sessionParams'];
             var sessionRefHash = sessionStorage['va:sessionRefHash'];
+
+            // Get user marketing sources
+            var userReferrer = localStorage['va:userReferrer'];
+            var userParams = localStorage['va:userParams'];
+            var userRefHash = localStorage['va:userRefHash'];
 
             // Initialize bookmarked post variable
             var bookmarkedPost = JSON.stringify(false);
 
             // Initialize event and event meta
             var eventName = "pageview";
-            var eventParams = "";
+            var eventMeta = "";
 
             // Check if event is pageview
             if (event=='pageview') {
@@ -184,7 +188,7 @@ exports.vaLoad = (req, res) => {
             } else {
                 // Log event metadata
                 eventName = event;
-                eventParams = JSON.stringify(eventMeta);
+                eventMeta = meta;
             }
            
             // Get page metadata
@@ -256,11 +260,42 @@ exports.vaLoad = (req, res) => {
             // Change window location hash
             window.location.hash = userHash;
         }
+
         // Fire pageview
-        vaEventLog();
+        try {
+            vaEventLog();
+        } catch(err) {
+            console.log(err);
+        }
+        
 
         // Set up event queue
-        
+        window.vaEventsQ = [];
+
+        // Set up event processing function
+        function processEvent(arguments) {
+            // this will be called on each .push
+            try {
+                var eventObj = arguments[0];
+                var eventName = eventObj['event'];
+                var eventMeta = JSON.parse(JSON.stringify(eventObj)); // clones
+                delete eventMeta['event'];
+                eventMeta = JSON.stringify(eventMeta);
+                vaEventLog(event=eventName, meta=eventMeta);
+            } catch(err) {
+                console.log(err);
+            }
+        }
+
+        // Overwrite push for the eventsQ
+        window.vaEventsQ.push = function() { Array.prototype.push.apply(this, arguments);  processEvent(arguments);};
+
+        // // Code for pushing custom events
+        // vaEventsQ.push({
+        //     'color': 'red',
+        //     'conversionValue': 50,
+        //     'event': 'customizeCar'
+        // });  
     }
     res.send("("+viralAnalyics.toString()+")();")
 };
