@@ -2,7 +2,6 @@ def main(request):
     """
     For testing input
     {"property": "lad-000000003-001", "refHash": "#e0yxeeaf596p8p1tvskqr"}
-    {"property": "ham-777777777-003", "refHash": "#5krbbqalcdypo0szxs0ev"}
     """
     # Set CORS headers for the preflight request
     if request.method == 'OPTIONS':
@@ -41,21 +40,12 @@ def main(request):
 
     db = firestore.client()
 
-    posts_ref = db.collection(u'posts')
+    leaderboards_ref = db.collection(u'leaderboards')
+    property_ref = leaderboards_ref.document(u'{}'.format(prop_id))
 
-    query = posts_ref.where(
-        u'property', u'==', u'{}'.format(prop_id)).where(
-            u'refHash', u'==', u'{}'.format(refHash))
+    leader_board = property_ref.get().to_dict()
 
-    results = query.stream()
-    records = []
-    for doc in results:
-        user_hash = doc.to_dict().get('userHash')
-    
-        if user_hash:
-            records.append(user_hash)
-
-    share_count = len(set(records))
+    place = leader_board[refHash]
 
     # Set CORS headers for the main request
     headers = {
@@ -63,4 +53,4 @@ def main(request):
     }
 
     # Return a 200 status
-    return (str(share_count), 200, headers)
+    return (str(place), 200, headers)

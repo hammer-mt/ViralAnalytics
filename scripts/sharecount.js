@@ -1,4 +1,17 @@
-window.addEventListener('load', function() {
+function loadShareCountCache() {
+    var shareCount = window.localStorage['va:shareCount'];
+    var ref = document.getElementById('va-shareCount');
+    
+    if (ref && shareCount) {
+        ref.innerText = shareCount;
+    } else {
+        ref.innerText = '0';
+    }
+}
+
+loadShareCountCache();
+
+function loadShareCountRemote() {
     var vaScript = document.getElementById('vaScript');
 
     var property = vaScript.getAttribute('data-property');
@@ -45,12 +58,22 @@ window.addEventListener('load', function() {
                 'influencerStatus': influencerStatus
             });
 
-            console.log(shareCount);
-            console.log(influencerStatus);
+            window.localStorage['va:shareCount'] = shareCount;
+            window.localStorage['va:influencerStatus'] = influencerStatus;
+          
+            var ref = document.getElementById('va-shareCount');
+            if (ref) {
+                ref.innerText = shareCount;
+            }
 
         } else if (this.readyState == 4 && this.status != 200) {
             var error = this.status + ": "+ this.responseText
             console.log(error);
         }
     }
-});
+}
+
+window.addEventListener ? 
+window.addEventListener("load",loadShareCountRemote,false) : 
+window.attachEvent && window.attachEvent("onload",loadShareCountRemote);
+

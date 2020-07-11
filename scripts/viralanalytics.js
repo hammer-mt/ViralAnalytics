@@ -110,7 +110,7 @@ exports.vaLoad = (req, res) => {
             }
 
             // Get valid ref hash
-            if (hash.search(/\w{21}/i) >= 0) {
+            if (hash.search(/\w{18}/i) >= 0) {
                 var refHash = hash;
             } else {
                 var refHash = "";
