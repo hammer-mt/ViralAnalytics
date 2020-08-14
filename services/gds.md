@@ -62,6 +62,9 @@ Source
 Medium
 `REGEXP_EXTRACT(href,"utm_medium=([^&#]+)")`
 
+Source / Medium
+`CONCAT(REGEXP_EXTRACT(href,"utm_source=([^&#]+)"),REGEXP_EXTRACT(href,"utm_medium=([^&#]+)"))`
+
 Campaign
 `REGEXP_EXTRACT(href,"utm_campaign=([^&#]+)")`
 
