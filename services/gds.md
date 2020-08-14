@@ -137,4 +137,4 @@ END
 
 
 Virality
-`(Record Count-sum(Viral Traffic))/sum(Viral Traffic)`
+`sum(Link Sharing Pageviews)/(Record Count - sum(Link Sharing Pageviews))`
